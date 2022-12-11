@@ -13,9 +13,9 @@ const newSignals = signals.map((s) => {
     return { cmd: "addx", X: parseInt(s.substring(s.lastIndexOf(" ") + 1)) };
   }
 });
-newSignals.forEach((s, i) => console.log(i, s));
+// newSignals.forEach((s, i) => console.log(i, s));
 
-const cycles = [{ cycle: 1, value: 1, strength: 0 }];
+const cycles = [{ cycle: 1, value: 1 }];
 let currentCycle = 1;
 let currentValue = 1;
 
@@ -23,11 +23,9 @@ newSignals.forEach((s) => {
   if (s.cmd === "noop") {
     const cycle = currentCycle++;
     const value = currentValue;
-    const strength = cycle * value;
     cycles.push({
       cycle,
       value,
-      strength,
     });
   } else {
     const { X } = s;
@@ -37,7 +35,6 @@ newSignals.forEach((s) => {
     cycles.push({
       cycle,
       value,
-      strength,
     });
     cycle = currentCycle++;
     value = currentValue;
@@ -45,16 +42,24 @@ newSignals.forEach((s) => {
     cycles.push({
       cycle,
       value,
-      strength,
     });
     currentValue += X;
   }
 });
 
-let sum = 0;
-for (i = 20; i < cycles.length; i += 40) {
-  sum += cycles[i].strength;
-  console.log(cycles[i], sum);
+cycles.forEach((s) => {
+  s.column = (s.cycle - 1) % 40;
+  s.pixel = Math.abs(s.column - s.value) < 2;
+  // console.log(s);
+});
+
+const crt = [];
+for (let row = 0; row < 6; row++) {
+  let pixels = "";
+  for (let col = 0; col < 40; col++) {
+    pixels += cycles[row * 40 + col].pixel ? "#" : ".";
+  }
+  crt[row] = pixels;
 }
 
-cycles.forEach((s) => console.log(s));
+console.log(crt);
